@@ -137,9 +137,24 @@ MonoBehaviour:
   cardBack: {fileID: 5189691121816951081, guid: cc0440950c6e2d14cada928677a7c46d, type: 3}
   sprites:
   - {fileID: 21300000, guid: 90caec01f73e11a46a6f562b566e68d0, type: 3}
+  - {fileID: 21300000, guid: 5aeea43d1ddbad0428fadfdbf77ef024, type: 3}
   - {fileID: 21300000, guid: f1ac7788bcf2a104f8327d2891a6f832, type: 3}
+  - {fileID: 21300000, guid: c626756f10bf6cc44a37d043bc0554d0, type: 3}
+  - {fileID: 21300000, guid: 45d5ceab984f1644cb63c8f8618740e5, type: 3}
   - {fileID: 21300000, guid: 59759dcd3d3949447b2d32f782e2a172, type: 3}
+  - {fileID: 21300000, guid: 59759dcd3d3949447b2d32f782e2a172, type: 3}
+  - {fileID: 21300000, guid: e42586fca9135994d8575b475731c186, type: 3}
+  - {fileID: 21300000, guid: fb06e157366574b40966b91e3e777090, type: 3}
+  - {fileID: 21300000, guid: f2f94280d11cf2945b34533ba230bbf3, type: 3}
+  - {fileID: 21300000, guid: b72e437b1d79b4b40b05bba27ba07a8d, type: 3}
+  - {fileID: 21300000, guid: da10ac616e3f25d479309658ad413f11, type: 3}
+  - {fileID: 21300000, guid: 27c3037be2432684dbc7e72950a52cde, type: 3}
+  - {fileID: 21300000, guid: a796fb19d0164ad4a84f6691356e9322, type: 3}
   - {fileID: 21300000, guid: 662876bb6929a3c4f839fcee36a193da, type: 3}
+  - {fileID: 21300000, guid: 662876bb6929a3c4f839fcee36a193da, type: 3}
+  - {fileID: 21300000, guid: fdfd2fc68cf2b6949ba730d1589fd363, type: 3}
+  - {fileID: 21300000, guid: 7c22278cf4ffa8340b2d4fe02aaf3c0f, type: 3}
+  - {fileID: 21300000, guid: 134634142185a204f8d141eb092904d6, type: 3}
   item:
     name: 
     cost: 0

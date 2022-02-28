@@ -7,16 +7,6 @@ using DG.Tweening;
 
 public class Card : MonoBehaviourPunCallbacks
 {
-    public Card(string _name, string _attack, string _health, string _cost, string _ability, int _spriteCount)
-    {
-        Name = _name;
-        Attack = _attack;
-        Health = _health;
-        Cost = _cost;
-        Ability = _ability;
-        spriteCount = _spriteCount;
-    } 
-
     #region 변수
     [SerializeField] SpriteRenderer card;
     [SerializeField] SpriteRenderer character;
@@ -49,12 +39,12 @@ public class Card : MonoBehaviourPunCallbacks
         this.isFront = isFront;
         if (isFront)
         {
-            character.sprite = sprites[spriteCount];
-            nameTMP.text = Name;
-            attackTMP.text = Attack;
-            healthTMP.text = Health;
-            costTMP.text = Cost;
-            abilityTMP.text = Ability;
+            character.sprite = sprites[item.spriteCount];
+            nameTMP.text = item.name;
+            attackTMP.text = item.attack.ToString();
+            healthTMP.text = item.health.ToString();
+            costTMP.text = item.cost.ToString();
+            abilityTMP.text = item.ToString();
 
         }
         else
@@ -76,13 +66,12 @@ public class Card : MonoBehaviourPunCallbacks
         this.isFront = isFront;
         if (isFront)
         {
-            character.sprite = sprites[spriteCount];
-            nameTMP.text = Name;
-            attackTMP.text = Attack;
-            healthTMP.text = Health;
-            costTMP.text = Cost;
-            abilityTMP.text = Ability;
-
+            character.sprite = sprites[item.spriteCount];
+            nameTMP.text = item.name;
+            attackTMP.text = item.attack.ToString();
+            healthTMP.text = item.health.ToString();
+            costTMP.text = item.cost.ToString();
+            abilityTMP.text = item.ToString();
         }
         else
         {

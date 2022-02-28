@@ -559,7 +559,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PV: {fileID: 1115993511}
-  startCardCount: 2
+  startCardCount: 5
   fastDraw: 0
   isLoading: 0
   myTurn: 0
