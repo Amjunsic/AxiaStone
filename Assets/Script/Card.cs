@@ -44,7 +44,7 @@ public class Card : MonoBehaviourPunCallbacks
             attackTMP.text = item.attack.ToString();
             healthTMP.text = item.health.ToString();
             costTMP.text = item.cost.ToString();
-            abilityTMP.text = item.ToString();
+            abilityTMP.text = item.ability.ToString();
 
         }
         else

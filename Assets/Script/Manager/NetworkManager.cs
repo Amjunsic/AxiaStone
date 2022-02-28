@@ -16,8 +16,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     [Header("Main")]
     public GameObject Main;
     public Button MatchBtn;
-    public Button OptionBtn;
+    public Button CollectionBtn;
     public Button ExitBtn;
+
+    [Header ("Collection")]
+    public GameObject Collection;
 
     private void Awake()
     {
@@ -59,4 +62,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         SceneManager.LoadScene(1);
     }
+
+#region Collection
+    public void OnCollectionPanel()
+    {
+        Collection.SetActive(true);
+    }
+    public void OffCollectionPanel()
+    {
+        Collection.SetActive(false);
+    }
+#endregion
 }
