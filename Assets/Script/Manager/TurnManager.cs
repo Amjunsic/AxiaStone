@@ -22,7 +22,7 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
     public bool myTurn;
 
     WaitForSeconds delay05 = new WaitForSeconds(0.5f);
-    WaitForSeconds delay06 = new WaitForSeconds(0.6f);
+    WaitForSeconds delay07 = new WaitForSeconds(0.7f);
 
     public static Action<bool> OnAddCard;
     public static event Action<bool> OnTurnStarted;
@@ -50,6 +50,7 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
 
         isLoading = true;
         
+        //카드 배분 
         for (int i = 0; i < startCardCount; i++)
         {
             yield return delay05;
@@ -64,20 +65,26 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
     {
         isLoading = true;
 
-        yield return delay06;
+        if(myTurn)
+            GameManager.Inst.NotificationPanel("My Turn");
+
+        yield return delay07;
         OnAddCard.Invoke(myTurn);
-        yield return delay06;
+        yield return delay07;
         isLoading = false;
         //OnTurnStarted.Invoke(myTurn);
+    }
+
+    public void EndTurn()
+    {
+        myTurn = !myTurn;
+        StartCoroutine(StartTurnCo());
     }
 
     #region RPC
     [PunRPC]
     void InitGameRPC()
     {
-        if(PhotonNetwork.CurrentRoom.PlayerCount != 2)
-            return;
-
         print("게임시작");
 
         for (int i = 0; i < 2; i++)

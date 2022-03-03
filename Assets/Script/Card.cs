@@ -58,6 +58,30 @@ public class Card : MonoBehaviourPunCallbacks
         }
     }
 
+    private void OnMouseOver() 
+    {
+        if(isFront)
+            CardManager.Inst.CardMouseOver(this);
+    }
+
+    private void OnMouseDown() 
+    {
+        if(isFront)
+            CardManager.Inst.CardMOuseDown();    
+    }
+
+    private void OnMouseUp() 
+    {
+        if(isFront)
+            CardManager.Inst.CardMouseUp();
+    }
+
+    private void OnMouseExit() 
+    {
+        if(isFront)
+            CardManager.Inst.CardMouseExit(this);
+    }
+
     public void SetUp(string Data, bool isFront)
     {
         var item = JsonUtility.FromJson<Item>(Data);

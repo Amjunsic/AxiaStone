@@ -11,12 +11,11 @@ GameObject:
   - component: {fileID: 8340755332051723312}
   - component: {fileID: 8340755332051723313}
   - component: {fileID: 8340755332051723315}
-  - component: {fileID: 5116542667842968691}
   - component: {fileID: 8340755332051723314}
   - component: {fileID: -1165171311590897580}
-  - component: {fileID: 5585134554817473445}
+  - component: {fileID: 2836083522911287891}
   m_Layer: 0
-  m_Name: Card
+  m_Name: Entity
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 8340755332051723310}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.9, y: 1.9, z: 1.9}
+  m_LocalScale: {x: 2.5, y: 2.5, z: 1.9}
   m_Children:
   - {fileID: 8340755333680565627}
   - {fileID: 8340755332307710978}
@@ -82,7 +81,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -8789749092250026857, guid: cc0440950c6e2d14cada928677a7c46d, type: 3}
+  m_Sprite: {fileID: -1150797853226429853, guid: cc0440950c6e2d14cada928677a7c46d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -114,61 +113,7 @@ MonoBehaviour:
   - {fileID: 8340755333441001248}
   - {fileID: 8340755332239053721}
   - {fileID: 8340755332790974621}
-  sortingLayerName: Card
---- !u!114 &5116542667842968691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8340755332051723310}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 680fe8514b352cf4d9b0128ec8814425, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  card: {fileID: 8340755332051723313}
-  character: {fileID: 8340755333680565626}
-  nameTMP: {fileID: 8340755332307710981}
-  attackTMP: {fileID: 8340755333441001249}
-  healthTMP: {fileID: 8340755333971416068}
-  costTMP: {fileID: 8340755332239053718}
-  abilityTMP: {fileID: 8340755332790974618}
-  cardFront: {fileID: -8789749092250026857, guid: cc0440950c6e2d14cada928677a7c46d, type: 3}
-  cardBack: {fileID: 5189691121816951081, guid: cc0440950c6e2d14cada928677a7c46d, type: 3}
-  sprites:
-  - {fileID: 21300000, guid: 90caec01f73e11a46a6f562b566e68d0, type: 3}
-  - {fileID: 21300000, guid: 5aeea43d1ddbad0428fadfdbf77ef024, type: 3}
-  - {fileID: 21300000, guid: f1ac7788bcf2a104f8327d2891a6f832, type: 3}
-  - {fileID: 21300000, guid: c626756f10bf6cc44a37d043bc0554d0, type: 3}
-  - {fileID: 21300000, guid: 45d5ceab984f1644cb63c8f8618740e5, type: 3}
-  - {fileID: 21300000, guid: 59759dcd3d3949447b2d32f782e2a172, type: 3}
-  - {fileID: 21300000, guid: 59759dcd3d3949447b2d32f782e2a172, type: 3}
-  - {fileID: 21300000, guid: e42586fca9135994d8575b475731c186, type: 3}
-  - {fileID: 21300000, guid: fb06e157366574b40966b91e3e777090, type: 3}
-  - {fileID: 21300000, guid: f2f94280d11cf2945b34533ba230bbf3, type: 3}
-  - {fileID: 21300000, guid: b72e437b1d79b4b40b05bba27ba07a8d, type: 3}
-  - {fileID: 21300000, guid: da10ac616e3f25d479309658ad413f11, type: 3}
-  - {fileID: 21300000, guid: 27c3037be2432684dbc7e72950a52cde, type: 3}
-  - {fileID: 21300000, guid: a796fb19d0164ad4a84f6691356e9322, type: 3}
-  - {fileID: 21300000, guid: 662876bb6929a3c4f839fcee36a193da, type: 3}
-  - {fileID: 21300000, guid: 662876bb6929a3c4f839fcee36a193da, type: 3}
-  - {fileID: 21300000, guid: fdfd2fc68cf2b6949ba730d1589fd363, type: 3}
-  - {fileID: 21300000, guid: 7c22278cf4ffa8340b2d4fe02aaf3c0f, type: 3}
-  - {fileID: 21300000, guid: 134634142185a204f8d141eb092904d6, type: 3}
-  item:
-    name: 
-    cost: 0
-    attack: 0
-    health: 0
-    spriteCount: 0
-    percent: 0
-    ability: 
-  PV: {fileID: 8340755332051723314}
-  originPRS:
-    pos: {x: 0, y: 0, z: 0}
-    rot: {x: 0, y: 0, z: 0, w: 0}
-    scale: {x: 0, y: 0, z: 0}
+  sortingLayerName: Entity
 --- !u!114 &8340755332051723314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -208,39 +153,19 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 1
   m_UseLocal: 1
---- !u!60 &5585134554817473445
-PolygonCollider2D:
+--- !u!65 &2836083522911287891
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8340755332051723310}
-  m_Enabled: 1
-  m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 3, y: 3.9375}
-    newSize: {x: 3.125, y: 4.0625}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Points:
-    m_Paths:
-    - - {x: -1.5, y: 1.96875}
-      - {x: -1.5767096, y: -1.9153205}
-      - {x: -0.80384004, y: -1.9418468}
-      - {x: -1.6363238, y: -3.4770744}
-      - {x: -1.6384168, y: -3.4958606}
-      - {x: 1.5854981, y: -1.923214}
-      - {x: 1.5, y: 1.90625}
-      - {x: 1.4375, y: 1.96875}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 3, y: 3.9375, z: 0.2}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8340755332239053716
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
+using Random = UnityEngine.Random;
 using UnityEngine;
 using Photon.Pun;
 
@@ -18,11 +20,17 @@ public class CardManager : MonoBehaviourPunCallbacks
     [SerializeField] Transform otherLeft;
     [SerializeField] Transform otherRight;
 
-    [Header("CardList")]
+    [Header("Card")]
     [SerializeField] List<Card> MyCards;
     [SerializeField] List<Card> OtherCards;
+    [SerializeField] ECardState eCard;
+    enum ECardState {Nothing, CanMouseOver, CanMouseDarg};
 
     List<Item> itemBuffer;
+    Card SelectCard;
+
+    bool isMyCardDrag;
+    bool onCardArea;
 
     public PhotonView PV;
     public GameObject Card;
@@ -44,6 +52,16 @@ public class CardManager : MonoBehaviourPunCallbacks
     void AddCard(bool isMine)
     {
         PV.RPC("AddCardRPC", RpcTarget.MasterClient, isMine);
+    }
+
+    void SetECardState()
+    {
+        if(TurnManager.Inst.isLoading)
+            eCard = ECardState.Nothing;
+        else if(!TurnManager.Inst.myTurn)
+            eCard = ECardState.CanMouseOver;
+        else if(TurnManager.Inst.myTurn)
+            eCard = ECardState.CanMouseDarg;
     }
     #endregion
 
@@ -117,10 +135,22 @@ public class CardManager : MonoBehaviourPunCallbacks
 
         return result;
     }
+    
+    void EnlargeCard(bool isEnlarge, Card card)
+    {
+        if(isEnlarge)
+        {
+            Vector3 enlargePos = new Vector3(card.originPRS.pos.x, -4.8f, -10f);
+            card.MoveTransform(new PRS(enlargePos, Utils.QI, Vector3.one * 3.5f), false);
+        }
+        else
+            card.MoveTransform(card.originPRS, false);
+
+        card.GetComponent<Order>().SetMostFrontOrder(isEnlarge);
+    }
     #endregion
 
     #region RPC
-
     //방장만 실행됨
     [PunRPC]
     void AddCardRPC(bool isMine)
@@ -187,9 +217,72 @@ public class CardManager : MonoBehaviourPunCallbacks
 
     #endregion
 
+    #region CardDrag
+
+    //카드에 마우스를 올렸을때
+    public void CardMouseOver(Card card)
+    {
+        if(eCard == ECardState.Nothing)
+            return;
+
+        SelectCard = card;
+        EnlargeCard(true, card);
+    }
+
+    //마우스가 카드를 드래그 했을때
+    public void CardMOuseDown()
+    {
+        if(eCard != ECardState.CanMouseDarg)
+            return;
+
+        isMyCardDrag = true;
+    }
+
+    public void CardMouseUp()
+    {
+        if (eCard != ECardState.CanMouseDarg)
+            return;
+
+        isMyCardDrag = false;
+    }
+
+    //카드에 마우스가 벗어났을때
+    public void CardMouseExit(Card card)
+    {
+        EnlargeCard(false, card);
+    }
+
+    void CardDrag()
+    {
+        //CardArea를 벗어 났을때 실행
+        if(!onCardArea)
+        {
+            SelectCard.MoveTransform(new PRS(Utils.MousePos, Utils.QI, SelectCard.originPRS.scale), false);
+        }
+    }
+
+    void DetectCardArea()
+    {
+        RaycastHit2D[] hits = Physics2D.RaycastAll(Utils.MousePos,Vector3.forward);
+        int layer = LayerMask.NameToLayer("CardAtea");
+        onCardArea = Array.Exists(hits, x => x.collider.gameObject.layer == layer);
+    }
+
+
+    #endregion
+
     private void Start()
     {
         PV.RPC("SetUpItemBuffer", RpcTarget.MasterClient);
         TurnManager.OnAddCard += AddCard;
+    }
+
+    private void Update() 
+    {
+        if(isMyCardDrag)
+            CardDrag();    
+
+        DetectCardArea();
+        SetECardState();
     }
 }
