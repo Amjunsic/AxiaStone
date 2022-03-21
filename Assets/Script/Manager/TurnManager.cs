@@ -27,8 +27,8 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
     public static Action<bool> OnAddCard;
     public static event Action<bool> OnTurnStarted;
 
-    int myNum;
-    int random;
+    public int myNum;
+    public int random;
 
     void GameSetup()
     {
@@ -39,11 +39,10 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
         if(fastDraw)
             delay05 = new WaitForSeconds(0.0f);
 
-        myTurn = random == myNum ? true : false;
-
-        //StartCoroutine(StartGameCo()); 
+        myTurn = myNum == random ? true : false;
     }
 
+    //게임 시작할때만 실행, 게임 클라이언트만 실행
     public IEnumerator StartGameCo()
     {
         GameSetup();
@@ -58,27 +57,39 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
             yield return delay05;
             OnAddCard?.Invoke(!myTurn);
         }
-        StartCoroutine(StartTurnCo());
+        PV.RPC("StartTurnCoRPC", RpcTarget.AllViaServer);
     }
 
     IEnumerator StartTurnCo()
     {
         isLoading = true;
-
         if(myTurn)
+        {
             GameManager.Inst.NotificationPanel("My Turn");
+            yield return delay07;
 
-        yield return delay07;
-        OnAddCard.Invoke(myTurn);
-        yield return delay07;
+            //함수를 실행시키는 사람을 판단
+            if(PhotonNetwork.IsMasterClient)
+                OnAddCard.Invoke(myTurn);
+            else
+                OnAddCard.Invoke(!myTurn);
+
+            yield return delay07;
+            //버튼 클릭후 색변화
+            OnTurnStarted.Invoke(myTurn);
+        }
+        else if(!myTurn)
+        {
+            GameManager.Inst.NotificationPanel("Other Turn");
+            yield return delay07;
+        }
         isLoading = false;
-        //OnTurnStarted.Invoke(myTurn);
     }
 
     public void EndTurn()
     {
-        myTurn = !myTurn;
-        StartCoroutine(StartTurnCo());
+        PV.RPC("ChangeTurnRPC", RpcTarget.AllViaServer);
+        PV.RPC("StartTurnCoRPC", RpcTarget.AllViaServer);
     }
 
     #region RPC
@@ -95,9 +106,21 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
     }
 
     [PunRPC]
+    void StartTurnCoRPC()
+    {
+        StartCoroutine(StartTurnCo());
+    }
+
+    [PunRPC]
     void RandomRPC()
     {
-        random = Random.Range(0, 1);
+        random = Random.Range(0, 2);
+    }
+
+    [PunRPC]
+    void ChangeTurnRPC()
+    {
+        myTurn = !myTurn;
     }
     #endregion
     
@@ -106,10 +129,12 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
         if(stream.IsWriting)
         {
             stream.SendNext(random);
+            stream.SendNext(!myTurn);
         }
         else
         {
             random = (int)stream.ReceiveNext();
+            myTurn = (bool)stream.ReceiveNext();
         }
 
     }

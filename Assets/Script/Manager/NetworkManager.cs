@@ -42,6 +42,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
+    
         //로비 접속시 실행
         PhotonNetwork.NickName = NickNameInput.text;
         NickNamePanel.SetActive(false);

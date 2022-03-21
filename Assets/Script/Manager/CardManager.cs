@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using Random = UnityEngine.Random;
 using UnityEngine;
+using DG.Tweening;
 using Photon.Pun;
 
 public class CardManager : MonoBehaviourPunCallbacks
@@ -24,7 +25,9 @@ public class CardManager : MonoBehaviourPunCallbacks
     [SerializeField] List<Card> MyCards;
     [SerializeField] List<Card> OtherCards;
     [SerializeField] ECardState eCard;
-    enum ECardState {Nothing, CanMouseOver, CanMouseDarg};
+    enum ECardState {Nothing, CanMouseOver, CanMouseDrag};
+
+    int myPutCount;
 
     List<Item> itemBuffer;
     Card SelectCard;
@@ -54,14 +57,25 @@ public class CardManager : MonoBehaviourPunCallbacks
         PV.RPC("AddCardRPC", RpcTarget.MasterClient, isMine);
     }
 
+    void AddCard(bool isMine, bool isClient)
+    {
+        PV.RPC("AddCardRPC", RpcTarget.MasterClient, isMine);
+    }
+
     void SetECardState()
     {
         if(TurnManager.Inst.isLoading)
             eCard = ECardState.Nothing;
-        else if(!TurnManager.Inst.myTurn)
+        else if(!TurnManager.Inst.myTurn || myPutCount == 5 || EntityManager.Inst.IsFullMyEntities)
             eCard = ECardState.CanMouseOver;
-        else if(TurnManager.Inst.myTurn)
-            eCard = ECardState.CanMouseDarg;
+        else if(TurnManager.Inst.myTurn && myPutCount == 0)
+            eCard = ECardState.CanMouseDrag;
+    }
+
+    void OnTurnStarted(bool isMine)
+    {
+        if(isMine)
+            myPutCount = 0;
     }
     #endregion
 
@@ -155,6 +169,7 @@ public class CardManager : MonoBehaviourPunCallbacks
     [PunRPC]
     void AddCardRPC(bool isMine)
     {
+
         Item item = PopItem();//카드 뽑기 방장만 뽑음
         var cardObject = Instantiate(Card, CardSpawnPoint.position, Utils.QI);//카드 생성
         var card = cardObject.GetComponent<Card>();
@@ -169,7 +184,7 @@ public class CardManager : MonoBehaviourPunCallbacks
         SetOriginOrder(isMine);
         CardAlignment(isMine);
     }
-
+    
     //상대방에게만 살행됨
     [PunRPC]
     void OtherCardAdd(string Data, bool isMine)
@@ -230,9 +245,9 @@ public class CardManager : MonoBehaviourPunCallbacks
     }
 
     //마우스가 카드를 드래그 했을때
-    public void CardMOuseDown()
+    public void CardMouseDown()
     {
-        if(eCard != ECardState.CanMouseDarg)
+        if(eCard != ECardState.CanMouseDrag)
             return;
 
         isMyCardDrag = true;
@@ -240,10 +255,15 @@ public class CardManager : MonoBehaviourPunCallbacks
 
     public void CardMouseUp()
     {
-        if (eCard != ECardState.CanMouseDarg)
+        isMyCardDrag = false;
+
+        if (eCard != ECardState.CanMouseDrag)//CanMouseDrag
             return;
 
-        isMyCardDrag = false;
+        if (onCardArea)
+            EntityManager.Inst.RemoveMyEmptyEntity();
+        else
+            TryPutCard(true);
     }
 
     //카드에 마우스가 벗어났을때
@@ -254,27 +274,69 @@ public class CardManager : MonoBehaviourPunCallbacks
 
     void CardDrag()
     {
+        if(eCard != ECardState.CanMouseDrag)
+            return;
+
         //CardArea를 벗어 났을때 실행
         if(!onCardArea)
         {
             SelectCard.MoveTransform(new PRS(Utils.MousePos, Utils.QI, SelectCard.originPRS.scale), false);
+            EntityManager.Inst.InsertMyEmptyEntity(Utils.MousePos.x);
         }
     }
 
     void DetectCardArea()
     {
         RaycastHit2D[] hits = Physics2D.RaycastAll(Utils.MousePos,Vector3.forward);
-        int layer = LayerMask.NameToLayer("CardAtea");
+        int layer = LayerMask.NameToLayer("CardArea");
         onCardArea = Array.Exists(hits, x => x.collider.gameObject.layer == layer);
     }
 
+    public bool TryPutCard(bool isMine)
+    {
+        //한턴에 최대 소환 가능한 엔티티수 설정시 
+        //SetECardState메소드에서도 값을 변경해줘야만 함
+        if(myPutCount >= 5)
+            return false;
+
+        Card card = SelectCard;
+        var targetCards = MyCards;
+
+        if(EntityManager.Inst.SpwanEntity(isMine, card.item))
+        {
+            targetCards.Remove(card);
+            card.transform.DOKill();
+            DestroyImmediate(card.gameObject);
+            if(isMine)
+            {
+                SelectCard = null;
+                myPutCount++;
+            }
+            CardAlignment(isMine);
+            return true;
+        }
+        else
+        {
+            targetCards.ForEach(x => x.GetComponent<Order>().SetMostFrontOrder(false));
+            CardAlignment(isMine);
+            return false;
+        }
+    }
 
     #endregion
 
+    #region MonoBehavior
     private void Start()
     {
         PV.RPC("SetUpItemBuffer", RpcTarget.MasterClient);
         TurnManager.OnAddCard += AddCard;
+        TurnManager.OnTurnStarted += OnTurnStarted;
+    }
+
+    private void OnDestroy() 
+    {
+        TurnManager.OnAddCard -= AddCard;
+        TurnManager.OnTurnStarted -= OnTurnStarted;
     }
 
     private void Update() 
@@ -285,4 +347,5 @@ public class CardManager : MonoBehaviourPunCallbacks
         DetectCardArea();
         SetECardState();
     }
+    #endregion
 }
