@@ -26,11 +26,11 @@ public class CardManager : MonoBehaviourPunCallbacks
     [SerializeField] List<Card> OtherCards;
     [SerializeField] ECardState eCard;
     enum ECardState {Nothing, CanMouseOver, CanMouseDrag};
-
     int myPutCount;
 
     List<Item> itemBuffer;
     Card SelectCard;
+    Card selectOtherCard;
 
     bool isMyCardDrag;
     bool onCardArea;
@@ -53,11 +53,6 @@ public class CardManager : MonoBehaviourPunCallbacks
     }
 
     void AddCard(bool isMine)
-    {
-        PV.RPC("AddCardRPC", RpcTarget.MasterClient, isMine);
-    }
-
-    void AddCard(bool isMine, bool isClient)
     {
         PV.RPC("AddCardRPC", RpcTarget.MasterClient, isMine);
     }
@@ -169,7 +164,6 @@ public class CardManager : MonoBehaviourPunCallbacks
     [PunRPC]
     void AddCardRPC(bool isMine)
     {
-
         Item item = PopItem();//카드 뽑기 방장만 뽑음
         var cardObject = Instantiate(Card, CardSpawnPoint.position, Utils.QI);//카드 생성
         var card = cardObject.GetComponent<Card>();
@@ -201,7 +195,23 @@ public class CardManager : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
+    void RemoveCard(string cardName)
+    {
+        print("제거값:" + cardName);
+        for(int i = 0; i <= OtherCards.Count; i++)
+        {
+            if(OtherCards[i].GetComponent<Card>().item.name== cardName)
+            {
+                DestroyImmediate(OtherCards[i].gameObject);
+                OtherCards.Remove(OtherCards[i]);
+                break;
+            }
+        }
+        CardAlignment(false);
+    }
+
     //카드 뭉치 설정 메소드
+    [PunRPC]
     void SetUpItemBuffer()
     {
         //아이템 버퍼에 카드 저장
@@ -233,7 +243,6 @@ public class CardManager : MonoBehaviourPunCallbacks
     #endregion
 
     #region CardDrag
-
     //카드에 마우스를 올렸을때
     public void CardMouseOver(Card card)
     {
@@ -301,10 +310,12 @@ public class CardManager : MonoBehaviourPunCallbacks
 
         Card card = SelectCard;
         var targetCards = MyCards;
+        //int index = findCardIndex(SelectCard, isMine);
 
         if(EntityManager.Inst.SpwanEntity(isMine, card.item))
         {
             targetCards.Remove(card);
+            PV.RPC("RemoveCard", RpcTarget.Others, SelectCard.GetComponent<Card>().item.name);
             card.transform.DOKill();
             DestroyImmediate(card.gameObject);
             if(isMine)
