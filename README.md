@@ -9,6 +9,8 @@
 
 ## 미군
 ------------------
+![미군입대 홍민혁](https://user-images.githubusercontent.com/90239340/160280589-58df2c24-ed0c-47a4-b025-6e6d332f992b.jpg)
+
 ![download](https://user-images.githubusercontent.com/90239340/160242355-0c176b3f-bba7-469b-a250-3f24830290ef.jpg)
 ## Reference
 ------------------
