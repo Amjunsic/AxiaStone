@@ -10,10 +10,6 @@
 ## 미군
 ------------------
 ![download](https://user-images.githubusercontent.com/90239340/160242355-0c176b3f-bba7-469b-a250-3f24830290ef.jpg)
-미군 != 홍민혁(에엑샤)
-평발공익 == 홍민혁
-
-
 ## Reference
 ------------------
 [하스스톤 유니티 튜토리얼](https://youtu.be/0_QHzyXVrJ0)
