@@ -15,7 +15,6 @@ public class UICard : MonoBehaviour
     [SerializeField] TMP_Text healthTMP;
     [SerializeField] TMP_Text costTMP;
     [SerializeField] TMP_Text abilityTMP;
-    [SerializeField] Sprite[] sprites;
     #endregion
 
     public Item item;
@@ -23,7 +22,7 @@ public class UICard : MonoBehaviour
     public void SetUp(Item item)
     {
         this.item = item;
-            character.sprite = sprites[item.spriteCount];
+            character.sprite = AssetManager.Inst.sprites[item.spriteCount];
             nameTMP.text = item.name;
             attackTMP.text = item.attack.ToString();
             healthTMP.text = item.health.ToString();

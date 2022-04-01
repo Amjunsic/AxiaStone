@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = UnityEngine.Random;
 using System;
 
@@ -29,6 +30,13 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
 
     public int myNum;
     public int random;
+
+    Hashtable nickNameCP;
+
+    private void Start() 
+    {
+        nickNameCP = PhotonNetwork.LocalPlayer.CustomProperties;   
+    }
 
     void GameSetup()
     {
@@ -60,30 +68,39 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
         PV.RPC("StartTurnCoRPC", RpcTarget.AllViaServer);
     }
 
-    IEnumerator StartTurnCo()
+    IEnumerator StartTurnCo(string NickNameCP)
     {
+        print("턴 시작됨");
         isLoading = true;
+
+        yield return delay07;
         if(myTurn)
         {
             GameManager.Inst.NotificationPanel("My Turn");
             yield return delay07;
 
             //함수를 실행시키는 사람을 판단
-            if(PhotonNetwork.IsMasterClient)
+            if (PhotonNetwork.IsMasterClient)
+            {
                 OnAddCard.Invoke(myTurn);
+            }
             else
+            {
                 OnAddCard.Invoke(!myTurn);
-
+            }
+            
             yield return delay07;
-            //버튼 클릭후 색변화
+            EndTurnButton.Inst.Setup(myTurn);
             OnTurnStarted.Invoke(myTurn);
         }
         else if(!myTurn)
         {
             GameManager.Inst.NotificationPanel("Other Turn");
+            EndTurnButton.Inst.Setup(myTurn);
             yield return delay07;
         }
         isLoading = false;
+        print("턴시작 종료됨");
     }
 
     public void EndTurn()
@@ -106,12 +123,6 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
     }
 
     [PunRPC]
-    void StartTurnCoRPC()
-    {
-        StartCoroutine(StartTurnCo());
-    }
-
-    [PunRPC]
     void RandomRPC()
     {
         random = Random.Range(0, 2);
@@ -121,6 +132,13 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
     void ChangeTurnRPC()
     {
         myTurn = !myTurn;
+    }
+
+    [PunRPC]
+    void StartTurnCoRPC()
+    {
+        print("턴시작 호출");
+        StartCoroutine(StartTurnCo(nickNameCP["Tag"].ToString()));
     }
     #endregion
     

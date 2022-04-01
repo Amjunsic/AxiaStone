@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Pun;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -12,6 +14,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public GameObject StartPanel;
     public GameObject StartButton;
     public GameObject WaitingText;
+    public Text PlayerCount;
 
     [Header("NotificationPanel")]
     [SerializeField]NotificationPanel notificationPanel;
@@ -22,21 +25,24 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         PV = photonView;
 
-        if (master())//방장 일때
+        if (PhotonNetwork.LocalPlayer.IsMasterClient)//방장 일때
         {
             StartButton.SetActive(true);//게임 시작 버튼 활성화
             WaitingText.SetActive(false);//게임이 시작될때까지 기다려 주세요... 텍스트 비활성화
+            PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { "Tag", "Admin" } });
         }
         else// 방장이 아닐때
         {
             StartButton.SetActive(false);//게임시작 버튼 비활성화
             WaitingText.SetActive(true);//게임이 시작될때까지 기다려 주세요... 텍스트 활성화
+            PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { "Tag", "Player" } });
         }
     }
 
-    bool master()
+    private void Update() 
     {
-        return PhotonNetwork.LocalPlayer.IsMasterClient;
+        //출력되는 텍스트: 방에 입장한 사람수 / 2
+        PlayerCount.text = PhotonNetwork.PlayerList.Length.ToString() + " " + "/" + " " + "2";
     }
 
     //게임시작 버튼 클릭시 실행되는 메소드

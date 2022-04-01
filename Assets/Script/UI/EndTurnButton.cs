@@ -5,6 +5,10 @@ using UnityEngine.UI;
 
 public class EndTurnButton : MonoBehaviour
 {
+    public static EndTurnButton Inst {get; private set;}
+
+    private void Awake() => Inst = this;
+
     [SerializeField] Sprite active;
     [SerializeField] Sprite inactive;
     [SerializeField] Text btnText;
@@ -15,16 +19,5 @@ public class EndTurnButton : MonoBehaviour
         GetComponent<Button>().interactable = isActive;
         btnText.color = isActive ? new Color32(255, 195, 90, 255) : new Color32(55, 55, 55, 255);
 
-    }
-
-    private void Start() 
-    {
-        Setup(false);
-        TurnManager.OnTurnStarted += Setup;    
-    }
-
-    private void OnDestroy() 
-    {
-        TurnManager.OnTurnStarted -= Setup;    
     }
 }

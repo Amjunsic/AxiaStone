@@ -132,3 +132,17 @@ MonoBehaviour:
     spriteCount: 16
     percent: 3
     ability: "\uAC00\uB098\uB2E4"
+  - name: "\uC784\uC2DC18"
+    cost: 1
+    attack: 1
+    health: 1
+    spriteCount: 17
+    percent: 3
+    ability: "\uAC00\uB098\uB2E4"
+  - name: "\uC784\uC2DC19"
+    cost: 1
+    attack: 1
+    health: 1
+    spriteCount: 18
+    percent: 3
+    ability: "\uAC00\uB098\uB2E4"

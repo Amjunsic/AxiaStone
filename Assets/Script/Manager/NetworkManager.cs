@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
@@ -12,16 +13,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public GameObject NickNamePanel;
     public InputField NickNameInput;
     public Button CheckButton;
+    public Text NetworkState;
 
     [Header("Main")]
     public GameObject Main;
     public Button MatchBtn;
     public Button CollectionBtn;
     public Button ExitBtn;
+    public Text _NickName;
 
     [Header ("Collection")]
     public GameObject Collection;
 
+
+    #region MonoBehavior
     private void Awake()
     {
         Screen.SetResolution(960, 540, false);
@@ -40,13 +45,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             NickNamePanel.SetActive(false);
     }
 
+    private void Update()
+    {
+        NetworkState.text = PhotonNetwork.NetworkClientState.ToString();
+    }
+    #endregion
+
+    #region Network
     public override void OnConnectedToMaster()
     {
-    
         //로비 접속시 실행
         PhotonNetwork.NickName = NickNameInput.text;
         NickNamePanel.SetActive(false);
-        print(PhotonNetwork.NickName);
+        _NickName.text = PhotonNetwork.NickName;
+
     }
 
     public void Lobby() => PhotonNetwork.ConnectUsingSettings();
@@ -63,8 +75,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         SceneManager.LoadScene(1);
     }
+    #endregion
 
-#region Collection
+    #region Collection
     public void OnCollectionPanel()
     {
         Collection.SetActive(true);

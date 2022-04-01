@@ -26,9 +26,9 @@ public class CardManager : MonoBehaviourPunCallbacks
     [SerializeField] List<Card> OtherCards;
     [SerializeField] ECardState eCard;
     enum ECardState {Nothing, CanMouseOver, CanMouseDrag};
-    int myPutCount;
+    int myPutCount;//최대 낼수 있는 카드의 수
 
-    List<Item> itemBuffer;
+    List<Item> itemBuffer;//게임진행중에 뽑게될 카드리스트
     Card SelectCard;
     Card selectOtherCard;
 
@@ -346,7 +346,7 @@ public class CardManager : MonoBehaviourPunCallbacks
 
     private void OnDestroy() 
     {
-        TurnManager.OnAddCard -= AddCard;
+        TurnManager.OnAddCard -=  AddCard;
         TurnManager.OnTurnStarted -= OnTurnStarted;
     }
 

@@ -22,6 +22,7 @@ public class Entity: MonoBehaviourPunCallbacks,IPunObservable
     public int attack;
     public int health;
     int liveCount;
+
     public bool isMine;
     public bool isBossOrEmpty;
     public Vector3 originPos;
@@ -33,17 +34,18 @@ public class Entity: MonoBehaviourPunCallbacks,IPunObservable
 
     void OnDestroy() 
     {
-        TurnManager.OnTurnStarted += OnTurnStarted;
+        TurnManager.OnTurnStarted -= OnTurnStarted;
     }
 
     void OnTurnStarted(bool myTurn)
     {
         if(isBossOrEmpty)
             return;
-        
-        if(isMine ==  myTurn)
+            
+        print(myTurn);
+
+        if(isMine == myTurn)
             liveCount++;
-        
         sleepParticle.SetActive(liveCount < 1);
     }
 
@@ -74,13 +76,13 @@ public class Entity: MonoBehaviourPunCallbacks,IPunObservable
         {
             stream.SendNext(attack);
             stream.SendNext(health);
-            stream.SendNext(liveCount);
+            //stream.SendNext(liveCount);
         }
         else
         {
             attack = (int)stream.ReceiveNext();
             health = (int)stream.ReceiveNext();
-            liveCount = (int)stream.ReceiveNext();
+            //liveCount = (int)stream.ReceiveNext();
         }
     }
 }

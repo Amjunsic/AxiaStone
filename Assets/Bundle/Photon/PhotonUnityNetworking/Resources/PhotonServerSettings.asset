@@ -59,6 +59,7 @@ MonoBehaviour:
   - ChangeTurnRPC
   - SpwanEntityRPC
   - RemoveCard
+  - OnTurnStartedRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

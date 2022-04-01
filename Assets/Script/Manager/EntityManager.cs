@@ -2,13 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 
 public class EntityManager : MonoBehaviourPunCallbacks
 {
     public static EntityManager Inst {get; private set;}
-
-    void Awake() => Inst = this;
 
     [SerializeField] GameObject entityPrefab;
     [SerializeField] List<Entity> myEntities;
@@ -20,8 +19,20 @@ public class EntityManager : MonoBehaviourPunCallbacks
     [SerializeField] Transform OtherCardSpawnPoint;
 
     const int Max_ENTITY_COUNT = 7;//엔티티 최대 소환 개수
-    
+    Hashtable nickNameCP;
     public PhotonView PV;
+
+    void Awake() => Inst = this;
+
+    private void Start() 
+    {
+        // if(PhotonNetwork.IsMasterClient)
+        //     PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { "Tag", "Admin"} });
+        // else
+        //     PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { "Tag", "Player" } });
+
+       nickNameCP = PhotonNetwork.LocalPlayer.CustomProperties;    
+    }
 
     #region 프로퍼티
     public bool IsFullMyEntities => myEntities.Count >= Max_ENTITY_COUNT && !ExistMyEmptyEntity;//나의 엔티티가 최대로 소환되었는지 값을 보내는 프로퍼티
@@ -84,18 +95,18 @@ public class EntityManager : MonoBehaviourPunCallbacks
         
         int index = MyEmptyEntityIndex;
         string Data = JsonUtility.ToJson(item);
-    
-        PV.RPC("SpwanEntityRPC", RpcTarget.AllViaServer, isMine, index, Data, PhotonNetwork.NickName);
+        PV.RPC("SpwanEntityRPC", RpcTarget.AllViaServer, isMine, index, Data, nickNameCP["Tag"].ToString());
 
         return true;
     }
 
-    //rpc를 호출한 사람이 누구인지 확인할수있는 방법을 찾아서 해결해야함
+    //rpc를 호출한 사람이 누구인지 확인할수있는 방법을 찾아서 해결해야함(대충 해결됨)
     [PunRPC]
     void SpwanEntityRPC(bool isMine, int index, string Data, string NickName)
     {
+        Hashtable nickNameCP = PhotonNetwork.LocalPlayer.CustomProperties;
         //임시로 닉네임으로만 호출한사람을 확인함
-        if(NickName != PhotonNetwork.NickName)
+        if(NickName != nickNameCP["Tag"].ToString())
         {
             isMine = !isMine;
         }
@@ -109,11 +120,12 @@ public class EntityManager : MonoBehaviourPunCallbacks
         if(isMine)
         {
             myEntities[MyEmptyEntityIndex] = entity;
+            entity.isMine = isMine;
         }
         else
         {
             otherEntities.Insert(index, entity);
-
+            entity.isMine = isMine;
         }
         entity.SetUp(item);
         EntityAlignment(isMine);
