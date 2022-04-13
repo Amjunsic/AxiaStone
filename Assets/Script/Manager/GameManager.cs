@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using Photon.Pun;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
@@ -17,25 +18,30 @@ public class GameManager : MonoBehaviourPunCallbacks
     public Text PlayerCount;
 
     [Header("NotificationPanel")]
-    [SerializeField]NotificationPanel notificationPanel;
+    [SerializeField]UIManager notificationPanel;
+
+    [Header("NickName")]
+    [SerializeField] TMP_Text MyNickName;
+    [SerializeField] TMP_Text OtherNickName;
 
     PhotonView PV;
+    //string OtherPlayerNickName = PhotonNetwork.PlayerListOthers[0].NickName;
 
     private void Start()
     {
         PV = photonView;
-
+            
         if (PhotonNetwork.LocalPlayer.IsMasterClient)//방장 일때
         {
             StartButton.SetActive(true);//게임 시작 버튼 활성화
             WaitingText.SetActive(false);//게임이 시작될때까지 기다려 주세요... 텍스트 비활성화
-            PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { "Tag", "Admin" } });
+            PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { "Owner", "Admin" } });
         }
         else// 방장이 아닐때
         {
             StartButton.SetActive(false);//게임시작 버튼 비활성화
             WaitingText.SetActive(true);//게임이 시작될때까지 기다려 주세요... 텍스트 활성화
-            PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { "Tag", "Player" } });
+            PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { "Owner", "Player" } });
         }
     }
 
@@ -64,5 +70,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     void StartPanelRPC()
     {
         StartPanel.SetActive(false);
+
+        MyNickName.text = PhotonNetwork.NickName;
+        OtherNickName.text = PhotonNetwork.PlayerListOthers[0].NickName;
     }
 }

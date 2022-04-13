@@ -95,7 +95,7 @@ public class EntityManager : MonoBehaviourPunCallbacks
         
         int index = MyEmptyEntityIndex;
         string Data = JsonUtility.ToJson(item);
-        PV.RPC("SpwanEntityRPC", RpcTarget.AllViaServer, isMine, index, Data, nickNameCP["Tag"].ToString());
+        PV.RPC("SpwanEntityRPC", RpcTarget.AllViaServer, isMine, index, Data, nickNameCP["Owner"].ToString());
 
         return true;
     }
@@ -106,7 +106,7 @@ public class EntityManager : MonoBehaviourPunCallbacks
     {
         Hashtable nickNameCP = PhotonNetwork.LocalPlayer.CustomProperties;
         //임시로 닉네임으로만 호출한사람을 확인함
-        if(NickName != nickNameCP["Tag"].ToString())
+        if(NickName != nickNameCP["Owner"].ToString())
         {
             isMine = !isMine;
         }

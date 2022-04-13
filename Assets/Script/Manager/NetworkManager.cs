@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
-using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
@@ -19,11 +18,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public GameObject Main;
     public Button MatchBtn;
     public Button CollectionBtn;
-    public Button ExitBtn;
+    public Button SettingBtn;
     public Text _NickName;
 
     [Header ("Collection")]
     public GameObject Collection;
+
+    [Header ("Setting")]
+    public GameObject Setting;
 
 
     #region MonoBehavior
@@ -86,5 +88,37 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         Collection.SetActive(false);
     }
-#endregion
+    #endregion
+
+    #region Settings
+    public void OnSettingPanel()
+    {
+        Setting.SetActive(true);
+    }
+
+    public void OffSettingPanel()
+    {
+        Setting.SetActive(false);
+    }
+
+    public void ScreenSizeDropDown(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                Screen.SetResolution(960, 540, false);
+                break;
+            case 1:
+                Screen.SetResolution(1280, 720, false);
+                break;
+            case 2:
+                Screen.SetResolution(1600, 900, false);
+                break;
+            case 3:
+                Screen.SetResolution(1920, 1080, false);
+                break;
+        }
+    }
+    #endregion
+
 }

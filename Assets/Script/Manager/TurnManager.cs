@@ -138,7 +138,7 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
     void StartTurnCoRPC()
     {
         print("턴시작 호출");
-        StartCoroutine(StartTurnCo(nickNameCP["Tag"].ToString()));
+        StartCoroutine(StartTurnCo(nickNameCP["Owner"].ToString()));
     }
     #endregion
     

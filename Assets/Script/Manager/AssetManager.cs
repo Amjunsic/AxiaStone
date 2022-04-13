@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AssetManager : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class AssetManager : MonoBehaviour
     private void Awake() => Inst = this;
 
     public Sprite[] sprites;
+    public Sprite[] emoji;
 
 
 }
