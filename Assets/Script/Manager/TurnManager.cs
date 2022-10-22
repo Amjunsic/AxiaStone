@@ -41,8 +41,8 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
     void GameSetup()
     {
         //플레이어 숫자태그 지정
-        PV.RPC("InitGameRPC", RpcTarget.AllViaServer);
-        PV.RPC("RandomRPC", RpcTarget.MasterClient);
+        PV.RPC(nameof(InitGameRPC), RpcTarget.AllViaServer);
+        PV.RPC(nameof(RandomRPC), RpcTarget.MasterClient);
         
         if(fastDraw)
             delay05 = new WaitForSeconds(0.0f);

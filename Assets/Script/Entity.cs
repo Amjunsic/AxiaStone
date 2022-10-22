@@ -24,6 +24,7 @@ public class Entity: MonoBehaviourPunCallbacks,IPunObservable
     int liveCount;
 
     public bool isMine;
+    public bool attackAble;
     public bool isBossOrEmpty;
     public Vector3 originPos;
 
@@ -69,6 +70,26 @@ public class Entity: MonoBehaviourPunCallbacks,IPunObservable
         else
             transform.position = pos;
     }
+
+    #region 엔티티위치
+    private void OnMouseDown() 
+    {
+        if(isMine)
+            EntityManager.Inst.EntityMouseDown(this);
+    }
+    
+    private void OnMouseUp() 
+    {
+        if(isMine)
+            EntityManager.Inst.EntityMouseUp();
+    }
+
+    private void OnMouseDrag() 
+    {
+        if (isMine)
+            EntityManager.Inst.EntityMouseDrag();
+    }
+    #endregion
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {

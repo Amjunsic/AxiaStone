@@ -15,29 +15,34 @@ public class EntityManager : MonoBehaviourPunCallbacks
     [SerializeField] Entity myEmptyEntity;
     [SerializeField] Entity myBossEntity;
     [SerializeField] Entity otherBossEntity;
-
     [SerializeField] Transform OtherCardSpawnPoint;
-
-    const int Max_ENTITY_COUNT = 7;//엔티티 최대 소환 개수
-    Hashtable nickNameCP;
     public PhotonView PV;
+    
+    const int Max_ENTITY_COUNT = 7;//엔티티 최대 소환 개수
+    
+    Hashtable nickNameCP;
+    Entity selectEntity;
+    Entity targetPickEntity;
+    WaitForSeconds delay1 = new WaitForSeconds(1);
 
     void Awake() => Inst = this;
 
     private void Start() 
     {
-        // if(PhotonNetwork.IsMasterClient)
-        //     PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { "Tag", "Admin"} });
-        // else
-        //     PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { "Tag", "Player" } });
-
+    //TurnManager.OnTurnStarted += AttackAbleReset;
        nickNameCP = PhotonNetwork.LocalPlayer.CustomProperties;    
+    }
+
+    private void OnDestroy() 
+    {
+        //TurnManager.OnTurnStarted -= AttackAbleReset;
     }
 
     #region 프로퍼티
     public bool IsFullMyEntities => myEntities.Count >= Max_ENTITY_COUNT && !ExistMyEmptyEntity;//나의 엔티티가 최대로 소환되었는지 값을 보내는 프로퍼티
     bool IsFullOtherEntities => otherEntities.Count >= Max_ENTITY_COUNT;//상대의 엔티티가 최대로 소환되었는지 값을 보내는 프로퍼티
     bool ExistMyEmptyEntity => myEntities.Exists(x => x == myEmptyEntity);//내 엔티티중에 전투중 사망한 엔티티가 있는지 보내는 프로퍼티
+    bool CanMouseOver => TurnManager.Inst.myTurn && !TurnManager.Inst.isLoading;//엔티티 드래그 가능한지 구별하는 프로퍼티
     int MyEmptyEntityIndex => myEntities.FindIndex(x => x == myEmptyEntity);//내 엔티티중에 전투중 사망한 엔티티의 위치를 보내는 프로퍼티
     #endregion
 
@@ -58,9 +63,11 @@ public class EntityManager : MonoBehaviourPunCallbacks
         }
     }
 
+    #region 엔티티소환
     //패에 있는 드래그 하고있는카드 저장
     public void InsertMyEmptyEntity(float xPos)
     {
+        //필드에 엔티티가 꽉차있을경우
         if(IsFullMyEntities)
             return;
 
@@ -105,7 +112,7 @@ public class EntityManager : MonoBehaviourPunCallbacks
     void SpwanEntityRPC(bool isMine, int index, string Data, string NickName)
     {
         Hashtable nickNameCP = PhotonNetwork.LocalPlayer.CustomProperties;
-        //임시로 닉네임으로만 호출한사람을 확인함
+        //커스텀프로퍼티 이용해서 함수를 호출한사람 판별
         if(NickName != nickNameCP["Owner"].ToString())
         {
             isMine = !isMine;
@@ -130,4 +137,53 @@ public class EntityManager : MonoBehaviourPunCallbacks
         entity.SetUp(item);
         EntityAlignment(isMine);
     }
+
+    public void AttackAbleReset(bool isMine)
+    {
+        var targetEntities = isMine ? myEntities : otherEntities;
+        targetEntities.ForEach(x => x.attackAble = true);
+    }
+    #endregion
+
+    #region EntityDrag
+    public void  EntityMouseDown(Entity entity)
+    {
+        if(!CanMouseOver)
+            return;
+        
+        selectEntity = entity;
+    }
+
+    public void EntityMouseUp()
+    {
+        if (!CanMouseOver)
+            return;
+
+        selectEntity = null;
+        targetPickEntity = null;
+    }
+
+    public void EntityMouseDrag()
+    {
+        if (!CanMouseOver || selectEntity == null)
+            return;
+
+        //other 타켓엔티티 찾기
+        bool existTarget = false;
+        
+        foreach(var hit in Physics2D.RaycastAll(Utils.MousePos,Vector3.forward))
+        {
+            Entity entity = hit.collider?.GetComponent<Entity>();
+            if(entity != null && !entity.isMine && selectEntity.attackAble)
+            {
+                targetPickEntity = entity;
+                existTarget = true;
+                break;
+            }
+        }
+        if(!existTarget)
+            targetPickEntity = null;
+    }
+    #endregion
+
 }
