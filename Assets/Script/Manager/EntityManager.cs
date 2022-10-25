@@ -102,21 +102,16 @@ public class EntityManager : MonoBehaviourPunCallbacks
         
         int index = MyEmptyEntityIndex;
         string Data = JsonUtility.ToJson(item);
-        PV.RPC("SpwanEntityRPC", RpcTarget.AllViaServer, isMine, index, Data, nickNameCP["Owner"].ToString());
+        PV.RPC(nameof(SpwanEntityRPC), RpcTarget.AllViaServer, isMine, index, Data);
 
         return true;
     }
 
-    //rpc를 호출한 사람이 누구인지 확인할수있는 방법을 찾아서 해결해야함(대충 해결됨)
+    //rpc를 호출한 사람이 누구인지 확인할수있는 방법을 찾아서 해결해야함(대충 해결됨) 이거 시발 좆같이 처리해놓고 
     [PunRPC]
-    void SpwanEntityRPC(bool isMine, int index, string Data, string NickName)
+    void SpwanEntityRPC(bool isMine, int index, string Data)
     {
-        Hashtable nickNameCP = PhotonNetwork.LocalPlayer.CustomProperties;
-        //커스텀프로퍼티 이용해서 함수를 호출한사람 판별
-        if(NickName != nickNameCP["Owner"].ToString())
-        {
-            isMine = !isMine;
-        }
+        isMine = TurnManager.Inst.IsMyTurn();
 
         var item = JsonUtility.FromJson<Item>(Data);
         var spawnPos = isMine ? Utils.MousePos : OtherCardSpawnPoint.position;

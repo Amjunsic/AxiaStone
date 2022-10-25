@@ -45,7 +45,7 @@ public class CardManager : MonoBehaviourPunCallbacks
     {
         //아이템버퍼에 카드가 없을때
         if (itemBuffer.Count == 0)
-            PV.RPC("SetUpItemBuffer", RpcTarget.MasterClient);
+            PV.RPC(nameof(SetUpItemBuffer), RpcTarget.MasterClient);
 
         Item item = itemBuffer[0];
         itemBuffer.RemoveAt(0);
@@ -53,8 +53,8 @@ public class CardManager : MonoBehaviourPunCallbacks
     }
 
     void AddCard(bool isMine)
-    {
-        PV.RPC("AddCardRPC", RpcTarget.MasterClient, isMine);
+    { 
+        PV.RPC(nameof(AddCardRPC), RpcTarget.MasterClient, isMine);
     }
 
     void SetECardState()
@@ -173,7 +173,7 @@ public class CardManager : MonoBehaviourPunCallbacks
 
         (isMine ? MyCards : OtherCards).Add(card);
 
-        PV.RPC("OtherCardAdd", RpcTarget.Others, Data, !isMine);
+        PV.RPC(nameof(OtherCardAdd), RpcTarget.Others, Data, !isMine);
 
         SetOriginOrder(isMine);
         CardAlignment(isMine);
@@ -197,7 +197,6 @@ public class CardManager : MonoBehaviourPunCallbacks
     [PunRPC]
     void RemoveCard(string cardName)
     {
-        print("제거값:" + cardName);
         for(int i = 0; i <= OtherCards.Count; i++)
         {
             if(OtherCards[i].GetComponent<Card>().item.name== cardName)
@@ -227,12 +226,10 @@ public class CardManager : MonoBehaviourPunCallbacks
         for (int i = 0; i < itemBuffer.Count; i++)
         {
             int rand = Random.Range(i, itemBuffer.Count);
-            Item temp = itemBuffer[i];
-            itemBuffer[i] = itemBuffer[rand];
-            itemBuffer[rand] = temp;
+            (itemBuffer[i], itemBuffer[rand]) = (itemBuffer[rand], itemBuffer[i]);
         }
         string itemBufferData = JsonUtility.ToJson(new Serialization<Item>(itemBuffer));
-        PV.RPC("SetUpBuffer", RpcTarget.Others, itemBufferData);
+        PV.RPC(nameof(SetUpBuffer), RpcTarget.Others, itemBufferData);
 
     }
 
@@ -315,7 +312,7 @@ public class CardManager : MonoBehaviourPunCallbacks
         if(EntityManager.Inst.SpwanEntity(isMine, card.item))
         {
             targetCards.Remove(card);
-            PV.RPC("RemoveCard", RpcTarget.Others, SelectCard.GetComponent<Card>().item.name);
+            PV.RPC(nameof(RemoveCard), RpcTarget.Others, SelectCard.GetComponent<Card>().item.name);
             card.transform.DOKill();
             DestroyImmediate(card.gameObject);
             if(isMine)
@@ -339,7 +336,7 @@ public class CardManager : MonoBehaviourPunCallbacks
     #region MonoBehavior
     private void Start()
     {
-        PV.RPC("SetUpItemBuffer", RpcTarget.MasterClient);
+        PV.RPC(nameof(SetUpItemBuffer), RpcTarget.MasterClient);
         TurnManager.OnAddCard += AddCard;
         TurnManager.OnTurnStarted += OnTurnStarted;
     }

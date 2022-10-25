@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = UnityEngine.Random;
 using System;
+using TMPro;
 
 public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
 {
@@ -14,40 +14,39 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
 
     public PhotonView PV;
 
+    #region Develop
     [Header("Develop")]
     [SerializeField] [Tooltip("시작 카드 설정")] int startCardCount;
     [SerializeField] [Tooltip("카드 뽑는 속도")] bool fastDraw;
-
+    #endregion
+    
+    #region Properties
     [Header("Properties")]
     public bool isLoading;
     public bool myTurn;
+    public int turnCount = 0;
+    [SerializeField]TMP_Text turnCountText;
+    #endregion
 
+    #region WaitForSeconds
     WaitForSeconds delay05 = new WaitForSeconds(0.5f);
     WaitForSeconds delay07 = new WaitForSeconds(0.7f);
+    #endregion
 
     public static Action<bool> OnAddCard;
     public static event Action<bool> OnTurnStarted;
 
-    public int myNum;
-    public int random;
-
-    Hashtable nickNameCP;
-
-    private void Start() 
-    {
-        nickNameCP = PhotonNetwork.LocalPlayer.CustomProperties;   
-    }
+    public static int myNum; //0아니면 1값만 가지게됨
 
     void GameSetup()
     {
         //플레이어 숫자태그 지정
         PV.RPC(nameof(InitGameRPC), RpcTarget.AllViaServer);
-        PV.RPC(nameof(RandomRPC), RpcTarget.MasterClient);
         
         if(fastDraw)
             delay05 = new WaitForSeconds(0.0f);
 
-        myTurn = myNum == random ? true : false;
+        myTurn = PhotonNetwork.IsMasterClient;
     }
 
     //게임 시작할때만 실행, 게임 클라이언트만 실행
@@ -65,12 +64,11 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
             yield return delay05;
             OnAddCard?.Invoke(!myTurn);
         }
-        PV.RPC("StartTurnCoRPC", RpcTarget.AllViaServer);
+        PV.RPC(nameof(StartTurnCoRPC), RpcTarget.AllViaServer);
     }
 
-    IEnumerator StartTurnCo(string NickNameCP)
+    IEnumerator StartTurnCo()
     {
-        print("턴 시작됨");
         isLoading = true;
 
         yield return delay07;
@@ -78,42 +76,42 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
         {
             GameManager.Inst.NotificationPanel("My Turn");
             yield return delay07;
-
-            //함수를 실행시키는 사람을 판단
+           
+            //함수를 실행시키는 사람을 판단-OnAddCard가 MasterClient에서만 실행되기 때문에 비교
             if (PhotonNetwork.IsMasterClient)
-            {
                 OnAddCard.Invoke(myTurn);
-            }
             else
-            {
                 OnAddCard.Invoke(!myTurn);
-            }
             
             yield return delay07;
-            EndTurnButton.Inst.Setup(myTurn);
-            OnTurnStarted.Invoke(myTurn);
         }
-        else if(!myTurn)
+        else
         {
             GameManager.Inst.NotificationPanel("Other Turn");
-            EndTurnButton.Inst.Setup(myTurn);
             yield return delay07;
         }
+        EndTurnButton.Inst.Setup(myTurn);
+        OnTurnStarted.Invoke(IsMyTurn());
         isLoading = false;
-        print("턴시작 종료됨");
     }
 
     public void EndTurn()
     {
-        PV.RPC("ChangeTurnRPC", RpcTarget.AllViaServer);
-        PV.RPC("StartTurnCoRPC", RpcTarget.AllViaServer);
+        PV.RPC(nameof(ChangeTurnRPC), RpcTarget.AllViaServer);
+        PV.RPC(nameof(StartTurnCoRPC), RpcTarget.AllViaServer);
+    }
+
+    public bool IsMyTurn()
+    {
+        int isEven = turnCount % 2;
+        if (isEven == myNum) return true;
+        return false;
     }
 
     #region RPC
     [PunRPC]
     void InitGameRPC()
     {
-        print("게임시작");
 
         for (int i = 0; i < 2; i++)
         {
@@ -123,37 +121,32 @@ public class TurnManager : MonoBehaviourPunCallbacks,IPunObservable
     }
 
     [PunRPC]
-    void RandomRPC()
-    {
-        random = Random.Range(0, 2);
-    }
-
-    [PunRPC]
     void ChangeTurnRPC()
     {
+        turnCount++;
+        turnCountText.text = turnCount.ToString();
         myTurn = !myTurn;
     }
 
     [PunRPC]
     void StartTurnCoRPC()
     {
-        print("턴시작 호출");
-        StartCoroutine(StartTurnCo(nickNameCP["Owner"].ToString()));
+        StartCoroutine(StartTurnCo());
     }
     #endregion
-    
+
+    #region Synchronization
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if(stream.IsWriting)
         {
-            stream.SendNext(random);
             stream.SendNext(!myTurn);
         }
         else
         {
-            random = (int)stream.ReceiveNext();
             myTurn = (bool)stream.ReceiveNext();
         }
 
     }
+    #endregion
 }

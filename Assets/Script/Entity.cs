@@ -21,7 +21,7 @@ public class Entity: MonoBehaviourPunCallbacks,IPunObservable
 
     public int attack;
     public int health;
-    int liveCount;
+    public int liveCount;
 
     public bool isMine;
     public bool attackAble;
@@ -42,12 +42,7 @@ public class Entity: MonoBehaviourPunCallbacks,IPunObservable
     {
         if(isBossOrEmpty)
             return;
-            
-        print(myTurn);
-
-        if(isMine == myTurn)
-            liveCount++;
-        sleepParticle.SetActive(liveCount < 1);
+        sleepParticle.SetActive(liveCount == TurnManager.Inst.turnCount);
     }
 
     public void SetUp(Item item)
@@ -61,6 +56,7 @@ public class Entity: MonoBehaviourPunCallbacks,IPunObservable
             healthTMP.text = item.health.ToString();
             nameTMP.text = this.item.name;
             character.sprite = AssetManager.Inst.sprites[item.spriteCount];
+            liveCount = TurnManager.Inst.turnCount;
     }
 
     public void MoveTranform(Vector3 pos, bool useDotween, float dotweenTime = 0)
@@ -97,13 +93,11 @@ public class Entity: MonoBehaviourPunCallbacks,IPunObservable
         {
             stream.SendNext(attack);
             stream.SendNext(health);
-            //stream.SendNext(liveCount);
         }
         else
         {
             attack = (int)stream.ReceiveNext();
             health = (int)stream.ReceiveNext();
-            //liveCount = (int)stream.ReceiveNext();
         }
     }
 }
